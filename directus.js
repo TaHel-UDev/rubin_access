@@ -94,17 +94,41 @@ class DirectusAPI {
   // Получить доступы сотрудника (keys уже включены в данные сотрудника)
   getEmployeeAccesses(employee) {
     try {
+      console.log('🔍 Обрабатываем доступы для сотрудника:', employee.fio);
+      console.log('🔑 Исходные keys:', employee.keys ? employee.keys.length : 'нет');
+      
       if (!employee || !employee.keys) {
+        console.log('❌ Нет данных сотрудника или keys');
         return [];
       }
 
+      // Выводим детали каждого ключа
+      employee.keys.forEach((key, index) => {
+        console.log(`🔑 Ключ ${index + 1}:`, {
+          id: key.id,
+          staff_materials_id: key.staff_materials_id ? {
+            id: key.staff_materials_id.id,
+            name: key.staff_materials_id.name,
+            status: key.staff_materials_id.status
+          } : 'нет данных'
+        });
+      });
+
       // Фильтруем только опубликованные доступы
-      return employee.keys.filter(key => 
-        key.staff_materials_id && 
-        key.staff_materials_id.status === 'published'
-      ).map(key => key.staff_materials_id);
+      const publishedAccesses = employee.keys.filter(key => {
+        const hasMaterials = key.staff_materials_id;
+        const isPublished = hasMaterials && key.staff_materials_id.status === 'published';
+        
+        console.log(`🔍 Ключ ${key.id}: hasMaterials=${hasMaterials}, isPublished=${isPublished}`);
+        
+        return hasMaterials && isPublished;
+      }).map(key => key.staff_materials_id);
+      
+      console.log('✅ Опубликованные доступы:', publishedAccesses.length);
+      
+      return publishedAccesses;
     } catch (error) {
-      console.error('Ошибка при обработке доступов:', error.message);
+      console.error('❌ Ошибка при обработке доступов:', error.message);
       return [];
     }
   }
@@ -133,6 +157,19 @@ class DirectusAPI {
         const collectionsResponse = await this.api.get('/collections');
         console.log('✅ Доступ к коллекциям:', collectionsResponse.status);
         console.log('📋 Доступные коллекции:', collectionsResponse.data.data?.map(c => c.collection).join(', '));
+        
+        // Проверяем структуру коллекции staff
+        try {
+          const staffResponse = await this.api.get('/items/staff', {
+            params: {
+              limit: 1,
+              fields: '*,keys.*.*'
+            }
+          });
+          console.log('📊 Структура staff (первая запись):', JSON.stringify(staffResponse.data.data?.[0], null, 2));
+        } catch (staffError) {
+          console.log('⚠️ Ошибка доступа к staff:', staffError.response?.status);
+        }
       } catch (collectionsError) {
         console.log('⚠️ Ошибка доступа к коллекциям:', collectionsError.response?.status);
       }

@@ -14,6 +14,7 @@ class AccessBot {
   setupHandlers() {
     // Команда /start
     this.bot.onText(/\/start/, async (msg) => {
+      console.log('📨 Получена команда /start от пользователя:', msg.from.username || msg.from.first_name);
       const chatId = msg.chat.id;
       const telegramId = msg.from.id;
       const username = msg.from.username || msg.from.first_name;
@@ -53,12 +54,21 @@ class AccessBot {
 
     // Команда /myaccesses
     this.bot.onText(/\/myaccesses/, async (msg) => {
+      console.log('📨 Получена команда /myaccesses от пользователя:', msg.from.username || msg.from.first_name);
       const chatId = msg.chat.id;
       const telegramId = msg.from.id;
 
       try {
         // Получаем данные сотрудника
         const employee = await this.directus.getEmployeeByTelegramId(telegramId, msg.from.username);
+        
+        console.log('👤 Данные сотрудника:', employee ? {
+          id: employee.id,
+          fio: employee.fio,
+          telegram_id: employee.telegram_id,
+          telegram_name: employee.telegram_name,
+          keys_count: employee.keys ? employee.keys.length : 0
+        } : 'Сотрудник не найден');
         
         if (!employee) {
           await this.bot.sendMessage(chatId, 
@@ -72,6 +82,7 @@ class AccessBot {
 
         // Получаем доступы сотрудника
         const accesses = this.directus.getEmployeeAccesses(employee);
+        console.log('🔑 Найденные доступы:', accesses.length, accesses.map(a => a.name));
         
         if (accesses.length === 0) {
           await this.bot.sendMessage(chatId, 
@@ -114,6 +125,7 @@ class AccessBot {
 
     // Команда /help
     this.bot.onText(/\/help/, async (msg) => {
+      console.log('📨 Получена команда /help от пользователя:', msg.from.username || msg.from.first_name);
       const chatId = msg.chat.id;
       
       const helpMessage = 
@@ -134,6 +146,7 @@ class AccessBot {
 
     // Команда /refresh
     this.bot.onText(/\/refresh/, async (msg) => {
+      console.log('📨 Получена команда /refresh от пользователя:', msg.from.username || msg.from.first_name);
       const chatId = msg.chat.id;
       
       try {
@@ -151,14 +164,14 @@ class AccessBot {
       }
     });
 
-    // Обработка неизвестных команд
+    // Обработка всех сообщений для отладки
     this.bot.on('message', (msg) => {
-      if (msg.text && msg.text.startsWith('/')) {
-        const chatId = msg.chat.id;
-        this.bot.sendMessage(chatId, 
-          '❓ Неизвестная команда. Используйте /help для списка доступных команд.'
-        );
-      }
+      console.log('📨 Получено сообщение:', {
+        text: msg.text,
+        from: msg.from.username || msg.from.first_name,
+        chatId: msg.chat.id,
+        messageId: msg.message_id
+      });
     });
 
     // Обработка ошибок
