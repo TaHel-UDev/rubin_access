@@ -55,7 +55,7 @@ class DirectusAPI {
         
         response = await this.api.get(`/items/${config.collections.staff}`, {
           params: {
-            fields: '*,keys.staff_materials_id.*',
+            fields: '*,keys.*.*',
             filter: {
               status: {
                 _eq: 'published'
@@ -98,9 +98,16 @@ class DirectusAPI {
     try {
       console.log('🔍 Обрабатываем доступы для сотрудника:', employee.fio);
       console.log('🔑 Исходные keys:', employee.keys ? employee.keys.length : 'нет');
+      console.log('🔑 Полная структура keys:', JSON.stringify(employee.keys, null, 2));
       
       if (!employee || !employee.keys) {
         console.log('❌ Нет данных сотрудника или keys');
+        return [];
+      }
+
+      // Проверяем, является ли keys массивом ID или объектов
+      if (Array.isArray(employee.keys) && employee.keys.length > 0 && typeof employee.keys[0] === 'number') {
+        console.log('⚠️ Keys содержит только ID, нужно получить полные данные');
         return [];
       }
 
