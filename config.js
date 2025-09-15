@@ -10,7 +10,7 @@ const config = {
     url: 'https://api.rubinloft.ru',
     // Для аутентификации можно использовать статический токен или логин/пароль
     // В зависимости от настроек вашего Directus
-    token: 'gfH4q150IbKbgj_9rkbfqNO9GNO6SZiL', // Замените на токен доступа к Directus
+    token: 'IbHf4Az8RL1Btj9QgmZJjhQx3X8YWcgA', // Замените на токен доступа к Directus
   },
   
   // Настройки базы данных (коллекции в Directus)
