@@ -30,7 +30,7 @@ class DirectusAPI {
       // Сначала ищем по telegram_id
       let response = await this.api.get(`/items/${config.collections.staff}`, {
         params: {
-          fields: '*,keys.*.*',
+          fields: '*,keys.staff_materials_id.*',
           filter: {
             status: {
               _eq: 'published'
@@ -55,7 +55,7 @@ class DirectusAPI {
         
         response = await this.api.get(`/items/${config.collections.staff}`, {
           params: {
-            fields: '*,keys.*.*',
+            fields: '*,keys.staff_materials_id.*',
             filter: {
               status: {
                 _eq: 'published'
