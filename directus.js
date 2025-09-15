@@ -30,7 +30,7 @@ class DirectusAPI {
       // Сначала ищем по telegram_id
       let response = await this.api.get(`/items/${config.collections.staff}`, {
         params: {
-          fields: '*,keys.staff_materials_id.*',
+          fields: '*,keys.*.*',
           filter: {
             status: {
               _eq: 'published'
@@ -43,6 +43,7 @@ class DirectusAPI {
       });
       
       console.log(`📊 Ответ от Directus (по telegram_id):`, response.status);
+      console.log(`📊 Данные ответа:`, JSON.stringify(response.data, null, 2));
       let employee = response.data.data && response.data.data.length > 0 ? response.data.data[0] : null;
       
       // Если не найден по ID и есть username, ищем по username
@@ -54,7 +55,7 @@ class DirectusAPI {
         
         response = await this.api.get(`/items/${config.collections.staff}`, {
           params: {
-            fields: '*,keys.staff_materials_id.*',
+            fields: '*,keys.*.*',
             filter: {
               status: {
                 _eq: 'published'
@@ -67,6 +68,7 @@ class DirectusAPI {
         });
         
         console.log(`📊 Ответ от Directus (по username):`, response.status);
+        console.log(`📊 Данные ответа (username):`, JSON.stringify(response.data, null, 2));
         employee = response.data.data && response.data.data.length > 0 ? response.data.data[0] : null;
       }
       
