@@ -27,6 +27,11 @@ const config = {
       myAccesses: '/myaccesses',
       refresh: '/refresh'
     }
+  },
+  
+  // Настройки сервера
+  server: {
+    port: 7997
   }
 };
 

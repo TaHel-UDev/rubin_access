@@ -1,7 +1,24 @@
 const AccessBot = require('./bot');
+const config = require('./config');
+const http = require('http');
 
 // Создаем и запускаем бота
 const bot = new AccessBot();
+
+// Создаем простой веб-сервер для проверки работы
+const server = http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({ 
+    status: 'ok', 
+    message: 'Rubin Access Bot is running',
+    timestamp: new Date().toISOString()
+  }));
+});
+
+// Запускаем сервер
+server.listen(config.server.port, () => {
+  console.log(`🌐 Сервер запущен на порту ${config.server.port}`);
+});
 
 // Обработка завершения процесса
 process.on('SIGINT', () => {
